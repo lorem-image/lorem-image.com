@@ -361,8 +361,8 @@ module.exports = function (grunt) {
       },
 
       deployEnvironment: {
-        src: 'server/config/deploy-local.env.js',
-        dest: 'server/config/local.env.js'
+        src: 'server/config/environment/deploy-local.env.js',
+        dest: 'server/config/environment/local.env.js'
       }
     },
 
