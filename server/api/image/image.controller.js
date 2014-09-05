@@ -65,16 +65,23 @@ exports.destroy = function(req, res) {
 
 
 
-// Deletes a image from the DB.
+// a random a image from a certain category.
 exports.category = function(req, res) {
-  console.log(req.params.category);
-  var cursor = Image.find({category: req.params.category});
+  var category = req.params.category,
+      index = req.params.index,
+      cursor = Image.find({category: category}),
+      callback = function(err, image) {
+        if(err) { return handleError(res, err); }
+        return res.json(200, image);
+      };
 
-  return random(cursor).exec(function(err, image) {
-  // return cursor.exec(function(err, image) {
-    if(err) { return handleError(res, err); }
-    return res.json(200, image);
-  });
+  if(!index) {
+    cursor = random(cursor);
+  } else {
+    cursor = cursor.skip(index - 1).limit(1).findOne();
+  }
+
+  return cursor.exec(callback);
 };
 
 // applies the "normal" sorting toa cursor

@@ -7,7 +7,7 @@ var router = express.Router();
 
 router.get('/', controller.index);
 router.get('/:id([0-9]+)', controller.show);
-router.get('/:category([a-zA-Z]+)', controller.category);
+router.get('/:category([a-zA-Z]+)/:index?', controller.category);
 router.post('/', controller.create);
 router.put('/:id([0-9]+)', controller.update);
 router.patch('/:id([0-9]+)', controller.update);
