@@ -5,10 +5,19 @@ var Image = require('./image.model');
 
 // Get list of images
 exports.index = function(req, res) {
-  Image.find(function (err, images) {
+  // Image.find(function (err, images) {
+  //   if(err) { return handleError(res, err); }
+  //   return res.json(200, images);
+  // });
+
+  var callback = function (err, images) {
     if(err) { return handleError(res, err); }
     return res.json(200, images);
-  });
+  };
+
+  var cursor = Image.find();
+
+  return normalSort(cursor).exec(callback);
 };
 
 // Get a single image
@@ -53,6 +62,37 @@ exports.destroy = function(req, res) {
     });
   });
 };
+
+
+
+// Deletes a image from the DB.
+exports.category = function(req, res) {
+  console.log(req.params.category);
+  var cursor = Image.find({category: req.params.category});
+
+  return random(cursor).exec(function(err, image) {
+    if(err) { return handleError(res, err); }
+    return res.json(200, image);
+  });
+};
+
+// applies the "normal" sorting toa cursor
+function normalSort (cursor) {
+  return cursor.sort({ $natural: 1 });
+}
+
+// returns a random item from a collection (cursor)
+function random(cursor) {
+  var rand = Math.random(),
+      cmp  = Math.random(),
+      result = cursor.findOne({random: {$gte: rand}});
+
+  if ( result === null ) {
+    result = cursor.findOne({random: {$lte: rand}});
+  }
+
+  return result;
+}
 
 function handleError(res, err) {
   return res.send(500, err);

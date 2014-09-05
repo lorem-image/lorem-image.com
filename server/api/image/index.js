@@ -6,10 +6,11 @@ var controller = require('./image.controller');
 var router = express.Router();
 
 router.get('/', controller.index);
-router.get('/:id', controller.show);
+router.get('/:id([0-9]+)', controller.show);
+router.get('/:category([a-zA-Z]+)', controller.category);
 router.post('/', controller.create);
-router.put('/:id', controller.update);
-router.patch('/:id', controller.update);
-router.delete('/:id', controller.destroy);
+router.put('/:id([0-9]+)', controller.update);
+router.patch('/:id([0-9]+)', controller.update);
+router.delete('/:id([0-9]+)', controller.destroy);
 
 module.exports = router;
