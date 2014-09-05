@@ -71,6 +71,7 @@ exports.category = function(req, res) {
   var cursor = Image.find({category: req.params.category});
 
   return random(cursor).exec(function(err, image) {
+  // return cursor.exec(function(err, image) {
     if(err) { return handleError(res, err); }
     return res.json(200, image);
   });
@@ -87,7 +88,7 @@ function random(cursor) {
       cmp  = Math.random(),
       result = cursor.findOne({random: {$gte: rand}});
 
-  if ( result === null ) {
+  if (!result) {
     result = cursor.findOne({random: {$lte: rand}});
   }
 
