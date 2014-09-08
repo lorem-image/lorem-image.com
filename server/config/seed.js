@@ -7,6 +7,7 @@
 
 var Thing = require('../api/thing/thing.model');
 var User = require('../api/user/user.model');
+var Image = require('../api/image/image.model');
 
 Thing.find({}).remove(function() {
   Thing.create({
@@ -46,4 +47,110 @@ User.find({}).remove(function() {
       console.log('finished populating users');
     }
   );
+});
+
+Image.find({}).remove(function() {
+  Image.create(
+  {
+    "src": "http://hdwallpapervault.com/wp-content/uploads/2013/06/Red-Fender-Guitar-Wallpaper.jpg",
+    "colors": [
+      "red",
+      "white"
+    ],
+    "category": [
+      "music",
+      "art"
+    ],
+    "random": 0.7375648128800094
+  },
+  {
+    "src": "http://primemag.me/wp-content/uploads/2014/08/modern-art.jpg",
+    "colors": [
+      "red",
+      "blue"
+    ],
+    "category": [
+      "art"
+    ],
+    "random": 0.5146371680311859
+  },
+  {
+    "src": "http://tudorbolnavu.ro/wp-content/themes/village/blueprint/gallery/ajaxupload/server/uploads/21.jpg",
+    "colors": [
+      "green",
+      "brown"
+    ],
+    "category": [
+      "art"
+    ],
+    "random": 0.7375648128800094
+  },
+  {
+    "src": "http://tudorbolnavu.ro/wp-content/themes/village/blueprint/gallery/ajaxupload/server/uploads/site.jpg",
+    "colors": [
+      "green"
+    ],
+    "category": [
+      "nature"
+    ],
+    "random": 0.09772267867811024
+  },
+  {
+    "src": "http://tudorbolnavu.ro/wp-content/themes/village/blueprint/gallery/ajaxupload/server/uploads/26.jpg",
+    "colors": [
+      "brown"
+    ],
+    "category": [
+      "art",
+      "city"
+    ],
+    "random": 0.7274456324521452
+  },
+  {
+    "src": "http://tudorbolnavu.ro/wp-content/themes/village/blueprint/gallery/ajaxupload/server/uploads/25.jpg",
+    "colors": [
+      "green"
+    ],
+    "category": [
+      "nature",
+      "animals"
+    ],
+    "random": 0.5734705831855536
+  },
+  {
+    "src": "http://tudorbolnavu.ro/wp-content/themes/village/blueprint/gallery/ajaxupload/server/uploads/14.jpg",
+    "colors": [
+      "gray",
+      "brown"
+    ],
+    "category": [
+      "nature",
+      "art"
+    ],
+    "random": 0.9608558556064963
+  },
+  {
+    "src": "http://tudorbolnavu.ro/wp-content/themes/village/blueprint/gallery/ajaxupload/server/uploads/8.jpg",
+    "colors": [
+      "blue",
+      "red"
+    ],
+    "category": [
+      "city"
+    ],
+    "random": 0.6978832732420415
+  },
+  {
+    "src": "http://tudorbolnavu.ro/wp-content/themes/village/blueprint/gallery/ajaxupload/server/uploads/4.jpg",
+    "colors": [
+      "black",
+      "yellow"
+    ],
+    "category": [
+      "city"
+    ],
+    "random": 0.5556299483869225
+  }, function() {
+    console.log('finished populating images :D');
+  });
 });
