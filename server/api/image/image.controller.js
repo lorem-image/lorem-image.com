@@ -3,30 +3,45 @@
 var _ = require('lodash');
 var Image = require('./image.model');
 
+
+var imageCallback = function(req, res, status) {
+  return function(err, image) {
+    if(err) { 
+      return handleError(res, err);
+    }
+    
+    if(!image) {
+      return res.status(404).end();
+    }
+    
+    var result = image,  
+        actions = {};
+
+    'grayscale width height'.split(' ').forEach(function(paramName, i) {
+      // console.log(paramName,req.param(paramName));
+      if(req.param(paramName)) {
+        actions[paramName] = req.param(paramName);
+      }
+    });
+
+    result.actions = actions;
+
+    // console.log(result);
+
+    return res.status(status || 200).json(result);
+  };
+};
+
 // Get list of images
 exports.index = function(req, res) {
-  // Image.find(function (err, images) {
-  //   if(err) { return handleError(res, err); }
-  //   return res.json(200, images);
-  // });
-
-  var callback = function (err, images) {
-    if(err) { return handleError(res, err); }
-    return res.json(200, images);
-  };
-
   var cursor = Image.find();
 
-  return normalSort(cursor).exec(callback);
+  return normalSort(cursor).exec(imageCallback(req, res));
 };
 
 // Get a single image
 exports.show = function(req, res) {
-  Image.findById(req.params.id, function (err, image) {
-    if(err) { return handleError(res, err); }
-    if(!image) { return res.send(404); }
-    return res.json(image);
-  });
+  Image.findById(req.params.id, imageCallback(req, res));
 };
 
 // Creates a new image in the DB.
@@ -43,11 +58,10 @@ exports.update = function(req, res) {
   Image.findById(req.params.id, function (err, image) {
     if (err) { return handleError(err); }
     if(!image) { return res.send(404); }
+
     var updated = _.merge(image, req.body);
-    updated.save(function (err) {
-      if (err) { return handleError(err); }
-      return res.json(200, image);
-    });
+
+    updated.save(imageCallback(req, res));
   });
 };
 
@@ -69,11 +83,7 @@ exports.destroy = function(req, res) {
 exports.category = function(req, res) {
   var category = req.params.category,
       index = req.params.index,
-      cursor = Image.find({category: category}),
-      callback = function(err, image) {
-        if(err) { return handleError(res, err); }
-        return res.json(200, image);
-      };
+      cursor = Image.find({category: category});
 
   if(!index) {
     cursor = random(cursor);
@@ -81,8 +91,78 @@ exports.category = function(req, res) {
     cursor = cursor.skip(index - 1).limit(1).findOne();
   }
 
-  return cursor.exec(callback);
+  return cursor.exec(imageCallback(req, res));
 };
+
+
+exports.composeCallback = function(req, res) {
+  var params = req.params,
+      cursor = new CursorOperation().all();
+
+  'color category'.split(' ').forEach(function(paramName, i) {
+    if(req.param(paramName)) {
+      cursor[paramName](req.param(paramName));
+    }
+  });
+
+  if(req.param('index')) {
+    cursor.index(req.param('index'));
+  } else {
+    cursor.random();
+  }
+
+
+  // use .lean() for making mongoose return plaing objects instead of full model instances 
+  return cursor._getCursor().lean().exec(imageCallback(req, res));
+}
+
+var cursorOperations = {
+  _getCursor: function() {
+    return this._cursor;
+  },
+
+  all: function() {
+    this._cursor = Image.find({});
+    return this;
+  },
+
+  id: function(id) {
+    this._getCursor().cursor.findById(id);
+    return this;
+  },
+
+  category: function(category) {
+    this._getCursor().find({category: category});
+    return this;
+  },
+
+  color: function(color) {
+    this._getCursor().find({color: color});
+    return this;
+  },
+
+  index: function(index) {
+    this._getCursor().skip(index - 1).limit(1).findOne();
+    return this;
+  },
+
+  random: function(){
+    var rand = Math.random(),
+        cursor = this._getCursor(),
+        result = cursor.findOne({random: {$gte: rand}});
+
+    if (!result) {
+      cursor.findOne({random: {$lte: rand}});
+    }
+
+    return this;
+  }
+};
+
+function CursorOperation(cursor) {
+  this.cursor = cursor || null;
+}
+CursorOperation.prototype = cursorOperations;
 
 // applies the "normal" sorting toa cursor
 function normalSort (cursor) {
